@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💊 Sistema de Registro de Medicamentos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .warning {
+            background: #ff9800;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-info {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .results {
+            padding: 30px;
+            min-height: 200px;
+        }
+
+        .results h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-critical {
+            background: #d1ecf1;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table th {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        .table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .risk-0 { background: #2196F3; }
+        .risk-1 { background: #4CAF50; }
+        .risk-2 { background: #ff9800; }
+        .risk-3 { background: #f44336; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💊 Sistema de Registro de Medicamentos</h1>
+            <p>Gestiona tu medicación de forma segura</p>
+        </div>
+
+        <div class="warning">
+            ⚠️ IMPORTANTE: Siempre consulta con un profesional de la salud antes de tomar medicamentos
+        </div>
+
+        <div class="controls">
+            <h3>🎛️ Controles:</h3>
+            
+            <div class="control-group">
+                <label for="medicamentSelect">Medicamento:</label>
+                <select id="medicamentSelect" class="dropdown">
+                    <option value="Medicamento A">Medicamento A</option>
+                    <option value="Medicamento B">Medicamento B</option>
+                    <option value="Medicamento C">Medicamento C</option>
+                    <option value="Medicamento D">Medicamento D</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-success" onclick="registrarMedicamento()">
+                    💊 Registrar Consumo
+                </button>
+                <button class="btn btn-info" onclick="mostrarHistorial()">
+                    📋 Mostrar Historial
+                </button>
+                <button class="btn btn-danger" onclick="limpiarHistorial()">
+                    🗑️ Limpiar Historial
+                </button>
+                <button class="btn btn-warning" onclick="mostrarMatriz()">
+                    📊 Ver Matriz Compatibilidad
+                </button>
+            </div>
+        </div>
+
+        <div class="results">
+            <h3>📤 Resultados:</h3>
+            <div id="resultContainer">
+                <div class="empty-state">
+                    <div class="icon">🏥</div>
+                    <p>Selecciona una acción para comenzar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MedicamentTracker {
+            constructor() {
+                // Matriz de compatibilidad
+                this.matrizCompatibilidad = {
+                    "Medicamento A": {
+                        "Medicamento A": 0,
+                        "Medicamento B": 1,
+                        "Medicamento C": 2,
+                        "Medicamento D": 3
+                    },
+                    "Medicamento B": {
+                        "Medicamento A": 1,
+                        "Medicamento B": 0,
+                        "Medicamento C": 1,
+                        "Medicamento D": 2
+                    },
+                    "Medicamento C": {
+                        "Medicamento A": 2,
+                        "Medicamento B": 1,
+                        "Medicamento C": 0,
+                        "Medicamento D": 1
+                    },
+                    "Medicamento D": {
+                        "Medicamento A": 3,
+                        "Medicamento B": 2,
+                        "Medicamento C": 1,
+                        "Medicamento D": 0
+                    }
+                };
+
+                // Mensajes de alerta
+                this.mensajesAlerta = {
+                    0: "Es el mismo medicamento.",
+                    1: "🐸 Alerta de compatibilidad! Bajo riesgo al mezclar estos medicamentos. 🔋 Pilas bb 🔋",
+                    2: "⚠️⚠️ Advertencia de compatibilidad! Alto riesgo al mezclar estos medicamentos ⚠️⚠️. ¡cuidado te malviajas 🙄 toma awita!",
+                    3: "💀 PELIGRO MORTAL 💀! La mezcla de estos medicamentos puede ser extremadamente peligrosa. ¡xfa no seas tan caballo ✖️🐎!"
+                };
+
+                // Registros en memoria
+                this.registros = [];
+            }
+
+            verificarCompatibilidad(medicamentoSeleccionado, fechaActual) {
+                const registrosDelDia = this.registros.filter(
+                    registro => registro.soloFecha === fechaActual
+                );
+
+                if (registrosDelDia.length === 0) {
+                    return { tieneAlerta: false, nivelRiesgo: 0, medicamentoConflicto: "", mensaje: "" };
+                }
+
+                for (let registro of registrosDelDia) {
+                    const medicamentoRegistradoHoy = registro.medicamento;
+
+                    // Si es el mismo medicamento
+                    if (medicamentoSeleccionado === medicamentoRegistradoHoy) {
+                        return {
+                            tieneAlerta: true,
+                            nivelRiesgo: 0,
+                            medicamentoConflicto: medicamentoRegistradoHoy,
+                            mensaje: `Ya has registrado '${medicamentoSeleccionado}' hoy.`
+                        };
+                    }
+
+                    // Medicamentos diferentes, verificar compatibilidad
+                    const nivelRiesgo = this.matrizCompatibilidad[medicamentoRegistradoHoy][medicamentoSeleccionado];
+                    if (nivelRiesgo > 0) {
+                        const mensajeCompleto = `${this.mensajesAlerta[nivelRiesgo]}\n\nIntentando registrar '${medicamentoSeleccionado}' el mismo día que se registró '${medicamentoRegistradoHoy}'.`;
+                        return {
+                            tieneAlerta: true,
+                            nivelRiesgo: nivelRiesgo,
+                            medicamentoConflicto: medicamentoRegistradoHoy,
+                            mensaje: mensajeCompleto
+                        };
+                    }
+                }
+
+                return { tieneAlerta: false, nivelRiesgo: 0, medicamentoConflicto: "", mensaje: "" };
+            }
+
+            registrarMedicamento(medicamento) {
+                const fechaHoraActual = new Date();
+                const fechaHoraFormateada = fechaHoraActual.toLocaleString('es-ES');
+                const soloFechaActual = fechaHoraActual.toISOString().split('T')[0];
+
+                const nuevoRegistro = {
+                    medicamento: medicamento,
+                    fechaHora: fechaHoraFormateada,
+                    soloFecha: soloFechaActual,
+                    timestamp: fechaHoraActual.getTime()
+                };
+
+                this.registros.push(nuevoRegistro);
+            }
+
+            mostrarAlerta(nivelRiesgo, mensaje) {
+                let alertClass = '';
+                let alertTitle = '';
+
+                switch (nivelRiesgo) {
+                    case 0:
+                        alertClass = 'alert-info';
+                        alertTitle = 'ℹ️ INFO';
+                        break;
+                    case 1:
+                        alertClass = 'alert-warning';
+                        alertTitle = '⚠️ ADVERTENCIA';
+                        break;
+                    case 2:
+                        alertClass = 'alert-danger';
+                        alertTitle = '🚨 ERROR';
+                        break;
+                    case 3:
+                        alertClass = 'alert-critical';
+                        alertTitle = '☠️ PELIGRO CRÍTICO';
+                        break;
+                    default:
+                        alertClass = 'alert-warning';
+                        alertTitle = '❓ ADVERTENCIA';
+                }
+
+                return `<div class="alert ${alertClass}"><strong>${alertTitle}:</strong> ${mensaje.replace(/\n/g, '<br>')}</div>`;
+            }
+
+            obtenerEstadisticas() {
+                const totalRegistros = this.registros.length;
+                const medicamentosUnicos = new Set(this.registros.map(r => r.medicamento)).size;
+                const fechaHoy = new Date().toISOString().split('T')[0];
+                const registrosHoy = this.registros.filter(r => r.soloFecha === fechaHoy).length;
+
+                return { totalRegistros, medicamentosUnicos, registrosHoy };
+            }
+        }
+
+        // Instancia global
+        const app = new MedicamentTracker();
+
+        function registrarMedicamento() {
+            const medicamentoSeleccionado = document.getElementById('medicamentSelect').value;
+            const fechaActual = new Date().toISOString().split('T')[0];
+            
+            let html = `<h4>🔍 Verificando compatibilidad para: ${medicamentoSeleccionado}</h4>`;
+            html += '<hr>';
+
+            // Verificar compatibilidad ANTES de registrar
+            const { tieneAlerta, nivelRiesgo, medicamentoConflicto, mensaje } = app.verificarCompatibilidad(
+                medicamentoSeleccionado, fechaActual
+            );
+
+            // Mostrar alerta si existe
+            if (tieneAlerta) {
+                html += app.mostrarAlerta(nivelRiesgo, mensaje);
+            }
+
+            // Registrar el medicamento
+            app.registrarMedicamento(medicamentoSeleccionado);
+
+            // Mostrar mensaje de confirmación
+            if (!tieneAlerta || nivelRiesgo === 0) {
+                html += `<div class="alert alert-info"><strong>✅</strong> Medicamento '${medicamentoSeleccionado}' registrado exitosamente</div>`;
+            } else {
+                html += `<div class="alert alert-warning"><strong>⚠️</strong> Medicamento '${medicamentoSeleccionado}' registrado con alerta de compatibilidad</div>`;
+            }
+
+            html += `<p><strong>📅 Fecha y hora:</strong> ${new Date().toLocaleString('es-ES')}</p>`;
+
+            document.getElementById('resultContainer').innerHTML = html;
+        }
+
+        function mostrarHistorial() {
+            let html = '<h4>📋 HISTORIAL DE CONSUMO DE MEDICAMENTOS</h4>';
+            html += '<hr>';
+
+            if (app.registros.length > 0) {
+                // Ordenar registros por fecha (más recientes primero)
+                const registrosOrdenados = [...app.registros].sort((a, b) => b.timestamp - a.timestamp);
+
+                html += '<table class="table">';
+                html += '<thead><tr><th>Medicamento</th><th>Fecha y Hora</th></tr></thead>';
+                html += '<tbody>';
+                
+                registrosOrdenados.forEach(registro => {
+                    html += `<tr><td>${registro.medicamento}</td><td>${registro.fechaHora}</td></tr>`;
+                });
+                
+                html += '</tbody></table>';
+
+                // Estadísticas
+                const stats = app.obtenerEstadisticas();
+                html += '<h5>📊 ESTADÍSTICAS:</h5>';
+                html += '<div class="stats">';
+                html += `<div class="stat-card"><div class="stat-number">${stats.totalRegistros}</div><div class="stat-label">Total de registros</div></div>`;
+                html += `<div class="stat-card"><div class="stat-number">${stats.medicamentosUnicos}</div><div class="stat-label">Medicamentos diferentes</div></div>`;
+                html += `<div class="stat-card"><div class="stat-number">${stats.registrosHoy}</div><div class="stat-label">Registros hoy</div></div>`;
+                html += '</div>';
+            } else {
+                html += '<div class="empty-state">';
+                html += '<div class="icon">📋</div>';
+                html += '<p>ℹ️ No hay registros de consumo aún.</p>';
+                html += '<p>Registra tu primer medicamento para comenzar.</p>';
+                html += '</div>';
+            }
+
+            document.getElementById('resultContainer').innerHTML = html;
+        }
+
+        function limpiarHistorial() {
+            app.registros = [];
+            document.getElementById('resultContainer').innerHTML = 
+                '<div class="alert alert-info"><strong>🗑️</strong> Historial limpiado exitosamente</div>';
+        }
+
+        function mostrarMatriz() {
+            let html = '<h4>📊 MATRIZ DE COMPATIBILIDAD</h4>';
+            html += '<hr>';
+
+            // Crear tabla de matriz
+            html += '<table class="table">';
+            html += '<thead><tr><th></th>';
+            
+            const medicamentos = Object.keys(app.matrizCompatibilidad);
+            medicamentos.forEach(med => {
+                html += `<th>${med}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            medicamentos.forEach(medRow => {
+                html += `<tr><td><strong>${medRow}</strong></td>`;
+                medicamentos.forEach(medCol => {
+                    const valor = app.matrizCompatibilidad[medRow][medCol];
+                    html += `<td class="risk-${valor}">${valor}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+
+            // Leyenda
+            html += '<div class="legend">';
+            html += '<h5>🔍 LEYENDA:</h5>';
+            html += '<div class="legend-item"><div class="legend-color risk-0"></div>0: Mismo medicamento</div>';
+            html += '<div class="legend-item"><div class="legend-color risk-1"></div>1: Bajo riesgo</div>';
+            html += '<div class="legend-item"><div class="legend-color risk-2"></div>2: Alto riesgo</div>';
+            html += '<div class="legend-item"><div class="legend-color risk-3"></div>3: Mortal</div>';
+            html += '</div>';
+
+            html += '<div class="legend">';
+            html += '<h5>💡 INFORMACIÓN SOBRE NIVELES DE RIESGO:</h5>';
+            html += '<p>🟢 <strong>Bajo riesgo:</strong> Precaución mínima requerida</p>';
+            html += '<p>🟠 <strong>Alto riesgo:</strong> Cuidado especial necesario</p>';
+            html += '<p>🔴 <strong>Peligro mortal:</strong> Combinación extremadamente peligrosa</p>';
+            html += '</div>';
+
+            document.getElementById('resultContainer').innerHTML = html;
+        }
+
+        // Inicialización
+        console.log('🚀 Aplicación inicializada correctamente');
+    </script>
+</body>
+</html>
